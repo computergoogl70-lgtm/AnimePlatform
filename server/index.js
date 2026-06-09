@@ -18,7 +18,7 @@ import streamProxyRoutes from './routes/streamProxy.js';
 
 const app = express();
 
-const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/$/, '');
+const clientUrl = (process.env.CLIENT_URL || 'https://animechannet.vercel.app').replace(/\/$/, '');
 
 app.set('trust proxy', 1);
 
