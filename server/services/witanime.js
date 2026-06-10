@@ -229,7 +229,8 @@ async function resolveWorkuploadUrl(fileUrl) {
 
   const dlUrl = dlRes.data?.data?.url;
   if (!dlUrl) throw new Error('No download URL from workupload');
-  return { url: dlUrl, type: 'mp4' };
+  const dlUrlWithCookie = `${dlUrl}?__cookie=${encodeURIComponent(cookies)}`;
+  return { url: dlUrlWithCookie, type: 'mp4' };
 }
 
 // ---------- Mediafire link extractor ----------

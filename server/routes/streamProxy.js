@@ -76,6 +76,26 @@ function buildHeaders(target, referer) {
   return headers;
 }
 
+function extractTargetUrlAndCookie(target) {
+  let targetUrl = target;
+  let cookieHeader = null;
+  if (targetUrl.includes('__cookie=')) {
+    try {
+      const urlObj = new URL(targetUrl);
+      cookieHeader = urlObj.searchParams.get('__cookie');
+      urlObj.searchParams.delete('__cookie');
+      targetUrl = urlObj.toString();
+    } catch {
+      const match = targetUrl.match(/[?&]__cookie=([^&]+)/);
+      if (match) {
+        cookieHeader = decodeURIComponent(match[1]);
+        targetUrl = targetUrl.replace(/[?&]__cookie=[^&]+/, '');
+      }
+    }
+  }
+  return { targetUrl, cookieHeader };
+}
+
 router.get('/hls', async (req, res) => {
   try {
     const { token, url: target } = req.query;
@@ -85,13 +105,19 @@ router.get('/hls', async (req, res) => {
       return res.status(400).send('Invalid stream URL');
     }
 
-    const { data } = await axios.get(target, {
+    const { targetUrl, cookieHeader } = extractTargetUrlAndCookie(target);
+    const headers = buildHeaders(targetUrl, payload.referer);
+    if (cookieHeader) {
+      headers.Cookie = cookieHeader;
+    }
+
+    const { data } = await axios.get(targetUrl, {
       timeout: 25000,
       responseType: 'text',
-      headers: buildHeaders(target, payload.referer),
+      headers,
     });
 
-    const rewritten = rewritePlaylist(data, target, token, req);
+    const rewritten = rewritePlaylist(data, targetUrl, token, req);
     res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.send(rewritten);
@@ -110,12 +136,16 @@ router.get('/segment', async (req, res) => {
       return res.status(400).send('Invalid segment URL');
     }
 
-    const headers = buildHeaders(target, payload.referer);
+    const { targetUrl, cookieHeader } = extractTargetUrlAndCookie(target);
+    const headers = buildHeaders(targetUrl, payload.referer);
+    if (cookieHeader) {
+      headers.Cookie = cookieHeader;
+    }
     if (req.headers.range) {
       headers.Range = req.headers.range;
     }
 
-    const response = await axios.get(target, {
+    const response = await axios.get(targetUrl, {
       timeout: 30000,
       responseType: 'stream',
       headers,

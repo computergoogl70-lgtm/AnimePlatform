@@ -37,7 +37,7 @@ export default function AdminDashboardPage() {
   const [sections, setSections] = useState([]);
   const [episodes, setEpisodes] = useState([]);
   const [consumetProviders, setConsumetProviders] = useState([]);
-  const [consumetProvider, setConsumetProvider] = useState('AnimeSaturn');
+  const [consumetProvider, setConsumetProvider] = useState('Witanime');
   const [consumetQuery, setConsumetQuery] = useState('');
   const [consumetResults, setConsumetResults] = useState([]);
   const [consumetBusy, setConsumetBusy] = useState(false);
