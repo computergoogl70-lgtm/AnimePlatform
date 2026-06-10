@@ -46,8 +46,27 @@ const DEFAULT_HEADERS = {
 };
 
 /**
+ * Detect if a response body is a Cloudflare JS challenge / interstitial page.
+ * CF challenges return HTTP 200 but with a page that requires JS to run.
+ * These pages are ~17KB and contain the CF challenge script markers.
+ */
+function isCloudflareChallenge(html) {
+  if (typeof html !== 'string') return false;
+  return (
+    html.includes('challenge-platform') ||
+    html.includes('cf-chl-') ||
+    html.includes('window.__CF$cv$params') ||
+    html.includes('jschl-answer') ||
+    html.includes('cf_clearance') ||
+    // A very short page from Witanime means no real content was returned
+    // (real Witanime pages are 35KB+)
+    (html.length < 25000 && html.includes('cloudflare'))
+  );
+}
+
+/**
  * Make an HTTP GET request, automatically retrying with fallback Witanime
- * domains if a 403 / 503 is received (Cloudflare blocks cloud-provider IPs).
+ * domains if a 403 / 503 / Cloudflare challenge is received.
  * Returns { data, finalBase } where finalBase is the working domain.
  */
 async function witanimeGet(path, extraHeaders = {}) {
@@ -65,23 +84,36 @@ async function witanimeGet(path, extraHeaders = {}) {
         timeout: 15000,
         maxRedirects: 5,
         validateStatus: (s) => s < 400,
-        // Decompress automatically
         decompress: true,
       });
-      // Update the global BASE to the working domain for subsequent calls
+
+      // Cloudflare can return 200 with a JS challenge page instead of real content.
+      // Detect this and try the next domain.
+      if (isCloudflareChallenge(res.data)) {
+        console.warn(`[witanime] ${domain} → Cloudflare JS challenge (rotating domain)`);
+        lastError = new Error(`Cloudflare challenge on ${domain}`);
+        continue;
+      }
+
       BASE = domain;
       return { data: res.data, finalBase: domain };
     } catch (err) {
       const status = err?.response?.status;
       console.warn(`[witanime] ${domain}${path} → ${status || err.message}`);
       lastError = err;
-      // Only rotate domains on Cloudflare-type errors (403, 503, ECONNREFUSED)
-      if (status !== 403 && status !== 503 && !err.code?.includes('ECONN')) {
-        throw err; // Non-CF error, don't bother rotating
+      // Only rotate on CF-type errors (403, 503, ECONNREFUSED, ETIMEDOUT)
+      if (
+        status !== 403 &&
+        status !== 503 &&
+        !err.code?.includes('ECONN') &&
+        !err.code?.includes('ETIMEDOUT') &&
+        err.code !== 'ECONNABORTED'
+      ) {
+        throw err;
       }
     }
   }
-  throw lastError || new Error('All Witanime domains failed');
+  throw lastError || new Error('All Witanime domains failed (all returned CF challenge or error)');
 }
 
 // ---------- Helpers ----------

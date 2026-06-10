@@ -136,13 +136,22 @@ export default function AdminDashboardPage() {
   const searchConsumet = async () => {
     if (!consumetQuery.trim()) return;
     setConsumetBusy(true);
+    setConsumetResults([]);
+    const loadingToast = toast.loading(`Searching ${consumetProvider} for "${consumetQuery.trim()}"…`);
     try {
       const { data } = await api.get('/admin/consumet/search', {
         params: { provider: consumetProvider, q: consumetQuery.trim() },
+        timeout: 30000, // Witanime can take 10-15s while rotating domains
       });
-      setConsumetResults(data.data || []);
+      const results = data.data || [];
+      setConsumetResults(results);
+      if (results.length === 0) {
+        toast.error('No results found — try a different spelling or provider.', { id: loadingToast });
+      } else {
+        toast.success(`Found ${results.length} result${results.length !== 1 ? 's' : ''}`, { id: loadingToast });
+      }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.message || 'Search failed', { id: loadingToast });
       setConsumetResults([]);
     } finally {
       setConsumetBusy(false);
@@ -311,7 +320,7 @@ export default function AdminDashboardPage() {
                   onClick={searchConsumet}
                   className="rounded-xl bg-zinc-800 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700 disabled:opacity-50"
                 >
-                  Search
+                  {consumetBusy ? 'Searching…' : 'Search'}
                 </button>
               </motion.div>
               {consumetResults.length > 0 && (
