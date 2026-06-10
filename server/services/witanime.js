@@ -1,24 +1,88 @@
 /**
  * Witanime Scraper Service
  * Provides search, anime info (with episode list), and episode stream extraction
- * for the Arabic anime streaming site Witanime (witanime.you)
+ * for the Arabic anime streaming site Witanime.
+ *
+ * Multiple base domains are tried in order to work around Cloudflare IP blocks
+ * on cloud hosting providers (e.g., Render).
  */
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import crypto from 'crypto';
 
-const BASE = 'https://witanime.you';
+// Domain rotation: we try each domain in order until one works.
+// This bypasses Cloudflare datacenter IP blocks common on hosting providers.
+const WITANIME_DOMAINS = [
+  'https://witanime.you',
+  'https://witanime.net',
+  'https://witanime.com',
+  'https://witaanime.com',
+];
+
+let BASE = WITANIME_DOMAINS[0];
 const WTSRV = 'https://wtsrv.xyz';
 const WORKUPLOAD = 'https://workupload.com';
 
 const UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
+// Full browser-like headers that help pass Cloudflare checks
 const DEFAULT_HEADERS = {
   'User-Agent': UA,
-  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'Accept-Language': 'ar,en;q=0.5',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+  'Accept-Language': 'ar-SA,ar;q=0.9,en-US;q=0.8,en;q=0.7',
+  'Accept-Encoding': 'gzip, deflate, br',
+  'Cache-Control': 'no-cache',
+  Pragma: 'no-cache',
+  'Sec-Ch-Ua': '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+  'Sec-Ch-Ua-Mobile': '?0',
+  'Sec-Ch-Ua-Platform': '"Windows"',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+  'Sec-Fetch-User': '?1',
+  'Upgrade-Insecure-Requests': '1',
+  Connection: 'keep-alive',
 };
+
+/**
+ * Make an HTTP GET request, automatically retrying with fallback Witanime
+ * domains if a 403 / 503 is received (Cloudflare blocks cloud-provider IPs).
+ * Returns { data, finalBase } where finalBase is the working domain.
+ */
+async function witanimeGet(path, extraHeaders = {}) {
+  let lastError;
+  for (const domain of WITANIME_DOMAINS) {
+    const url = path.startsWith('http') ? path : `${domain}${path}`;
+    try {
+      const res = await axios.get(url, {
+        headers: {
+          ...DEFAULT_HEADERS,
+          Referer: domain + '/',
+          Origin: domain,
+          ...extraHeaders,
+        },
+        timeout: 15000,
+        maxRedirects: 5,
+        validateStatus: (s) => s < 400,
+        // Decompress automatically
+        decompress: true,
+      });
+      // Update the global BASE to the working domain for subsequent calls
+      BASE = domain;
+      return { data: res.data, finalBase: domain };
+    } catch (err) {
+      const status = err?.response?.status;
+      console.warn(`[witanime] ${domain}${path} → ${status || err.message}`);
+      lastError = err;
+      // Only rotate domains on Cloudflare-type errors (403, 503, ECONNREFUSED)
+      if (status !== 403 && status !== 503 && !err.code?.includes('ECONN')) {
+        throw err; // Non-CF error, don't bother rotating
+      }
+    }
+  }
+  throw lastError || new Error('All Witanime domains failed');
+}
 
 // ---------- Helpers ----------
 
@@ -267,10 +331,8 @@ async function resolveMediafireUrl(fileUrl) {
  * Returns array of { id, title, image }
  */
 export async function witanimeSearch(query) {
-  const res = await axios.get(`${BASE}/?search_param=animes&s=${encodeURIComponent(query)}`, {
-    headers: DEFAULT_HEADERS,
-  });
-  const $ = cheerio.load(res.data);
+  const { data } = await witanimeGet(`/?search_param=animes&s=${encodeURIComponent(query)}`);
+  const $ = cheerio.load(data);
   const results = [];
   $('.anime-card-container').each((i, el) => {
     const a = $(el).find('.anime-card-title a');
@@ -287,8 +349,9 @@ export async function witanimeSearch(query) {
  * animeId is the full URL: https://witanime.you/anime/...
  */
 export async function witanimeAnimeInfo(animeId) {
-  const res = await axios.get(animeId, { headers: DEFAULT_HEADERS });
-  const $ = cheerio.load(res.data);
+  // animeId is a full URL; pass it directly and witanimeGet will use it as-is
+  const { data } = await witanimeGet(animeId);
+  const $ = cheerio.load(data);
 
   const title = $('h1').first().text().trim();
   const image =
@@ -298,7 +361,7 @@ export async function witanimeAnimeInfo(animeId) {
   $('.anime-genres a, .anime-genre a').each((i, el) => genres.push($(el).text().trim()));
   const status = $('.anime-status').text().trim();
 
-  const rawEpisodes = decryptEpisodes(res.data);
+  const rawEpisodes = decryptEpisodes(data);
   const episodes = rawEpisodes.map((ep) => ({
     id: ep.url,
     number: parseInt(ep.number, 10) || 0,
@@ -325,11 +388,10 @@ export async function witanimeAnimeInfo(animeId) {
  * Returns { url, type: 'mp4', subtitles: [] }
  */
 export async function witanimeEpisodeStream(episodeId) {
-  const res = await axios.get(episodeId, {
-    headers: { ...DEFAULT_HEADERS, Referer: BASE },
-  });
+  // episodeId is a full URL; pass it directly
+  const { data } = await witanimeGet(episodeId);
 
-  const wtsrvUrls = decryptServerUrls(res.data);
+  const wtsrvUrls = decryptServerUrls(data);
   if (!wtsrvUrls.length) {
     throw new Error('No stream servers found for this episode.');
   }
