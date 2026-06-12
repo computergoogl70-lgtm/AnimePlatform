@@ -46,27 +46,41 @@ const DEFAULT_HEADERS = {
 };
 
 /**
- * Detect if a response body is a Cloudflare JS challenge / interstitial page.
- * CF challenges return HTTP 200 but with a page that requires JS to run.
- * These pages are ~17KB and contain the CF challenge script markers.
+ * Detect if a response body is a true Cloudflare JS challenge / interstitial.
+ *
+ * IMPORTANT: Witanime includes the CF analytics beacon on EVERY page (including
+ * real content pages), so we cannot rely solely on "cloudflare" or
+ * "challenge-platform" strings. A real CF challenge page has:
+ *   1. Active challenge tokens (cf-chl-, jschl-answer, __CF$cv$params)
+ *   2. AND is very short (no real body content) — under 30KB
+ * Real Witanime search/anime pages are always 35KB+.
  */
 function isCloudflareChallenge(html) {
   if (typeof html !== 'string') return false;
-  return (
-    html.includes('challenge-platform') ||
+
+  // Hard CF challenge markers — these only appear on actual challenge pages
+  const hasHardCFMarker =
     html.includes('cf-chl-') ||
-    html.includes('window.__CF$cv$params') ||
     html.includes('jschl-answer') ||
-    html.includes('cf_clearance') ||
-    // A very short page from Witanime means no real content was returned
-    // (real Witanime pages are 35KB+)
-    (html.length < 25000 && html.includes('cloudflare'))
-  );
+    html.includes('jschl_vc') ||
+    html.includes('cf-please-wait');
+
+  if (hasHardCFMarker) return true;
+
+  // Soft detection: very small page (< 30KB) with NO real witanime content
+  const isTiny = html.length < 30000;
+  const hasNoContent =
+    !html.includes('anime-card') &&
+    !html.includes('anime-list') &&
+    !html.includes('wp-content') &&
+    !html.includes('witanime');
+
+  return isTiny && hasNoContent;
 }
 
 /**
  * Make an HTTP GET request, automatically retrying with fallback Witanime
- * domains if a 403 / 503 / Cloudflare challenge is received.
+ * domains if a 403 / 503 / true Cloudflare challenge is received.
  * Returns { data, finalBase } where finalBase is the working domain.
  */
 async function witanimeGet(path, extraHeaders = {}) {
@@ -81,27 +95,27 @@ async function witanimeGet(path, extraHeaders = {}) {
           Origin: domain,
           ...extraHeaders,
         },
-        timeout: 15000,
+        timeout: 20000,
         maxRedirects: 5,
         validateStatus: (s) => s < 400,
         decompress: true,
       });
 
-      // Cloudflare can return 200 with a JS challenge page instead of real content.
-      // Detect this and try the next domain.
+      // Only rotate domain if we got a genuine CF challenge interstitial
       if (isCloudflareChallenge(res.data)) {
-        console.warn(`[witanime] ${domain} → Cloudflare JS challenge (rotating domain)`);
+        console.warn(`[witanime] ${domain} → genuine CF challenge, rotating domain`);
         lastError = new Error(`Cloudflare challenge on ${domain}`);
         continue;
       }
 
       BASE = domain;
+      console.log(`[witanime] Using domain: ${domain} (${typeof res.data === 'string' ? res.data.length : '?'} bytes)`);
       return { data: res.data, finalBase: domain };
     } catch (err) {
       const status = err?.response?.status;
-      console.warn(`[witanime] ${domain}${path} → ${status || err.message}`);
+      console.warn(`[witanime] ${domain}${path} → ${status || err.code || err.message}`);
       lastError = err;
-      // Only rotate on CF-type errors (403, 503, ECONNREFUSED, ETIMEDOUT)
+      // Only rotate on CF-type / network errors
       if (
         status !== 403 &&
         status !== 503 &&
@@ -113,8 +127,9 @@ async function witanimeGet(path, extraHeaders = {}) {
       }
     }
   }
-  throw lastError || new Error('All Witanime domains failed (all returned CF challenge or error)');
+  throw lastError || new Error('All Witanime domains failed');
 }
+
 
 // ---------- Helpers ----------
 
