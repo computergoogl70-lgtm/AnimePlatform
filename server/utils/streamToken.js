@@ -1,9 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 export const PROVIDER_REFERERS = {
-  Witanime: 'https://workupload.com/',
   AnimeSaturn: 'https://www.animesaturn.cx/',
-  AnimeUnity: 'https://www.animeunity.to/',
 };
 
 export function refererForProvider(providerId) {

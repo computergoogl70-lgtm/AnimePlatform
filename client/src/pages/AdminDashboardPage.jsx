@@ -291,7 +291,7 @@ export default function AdminDashboardPage() {
             <div className="glass space-y-4 rounded-2xl p-6">
               <h2 className="text-lg font-bold text-white">Import episodes via Consumet</h2>
               <p className="text-sm text-zinc-500">
-                Pulls episode lists; stream is resolved when users watch. AnimeSaturn (Italian) provides the most reliable HLS streams.
+                Import episodes from Consumet providers. Streams are resolved when users watch.
               </p>
               <motion.div className="flex flex-wrap gap-3">
                 <select

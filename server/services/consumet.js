@@ -1,9 +1,4 @@
 import { createRequire } from 'module';
-import {
-  witanimeSearch,
-  witanimeAnimeInfo,
-  witanimeEpisodeStream,
-} from './witanime.js';
 
 const require = createRequire(import.meta.url);
 const { ANIME } = require('@consumet/extensions');
@@ -11,8 +6,6 @@ const { ANIME } = require('@consumet/extensions');
 /** All providers available for importing episodes in the Admin panel */
 export const CONSUMET_PROVIDERS = [
   { id: 'AnimeSaturn', label: 'AnimeSaturn (Italian - Recommended)', watch: true },
-  { id: 'AnimeUnity', label: 'AnimeUnity (Italian)', watch: true },
-  { id: 'Witanime', label: 'Witanime (Arabic - may use embed fallback)', watch: true },
 ];
 
 export const WATCH_PROVIDERS = CONSUMET_PROVIDERS.filter((p) => p.watch);
@@ -29,19 +22,13 @@ export function assertWatchProvider(providerId) {
   const meta = CONSUMET_PROVIDERS.find((p) => p.id === providerId);
   if (!meta?.watch) {
     throw new Error(
-      `${providerId || 'This provider'} cannot play video here. Use Witanime in Admin → Episodes.`
+      `${providerId || 'This provider'} cannot play video here.`
     );
   }
 }
 
 export async function consumetSearch(providerId, query) {
   assertWatchProvider(providerId);
-
-  // Route Witanime requests to our custom scraper
-  if (providerId === 'Witanime') {
-    return witanimeSearch(query);
-  }
-
   const provider = getConsometProvider(providerId);
   const data = await provider.search(query);
   return (data?.results || []).map((r) => ({
@@ -58,12 +45,6 @@ export async function consumetSearch(providerId, query) {
 
 export async function consumetAnimeInfo(providerId, animeId) {
   assertWatchProvider(providerId);
-
-  // Route Witanime requests to our custom scraper
-  if (providerId === 'Witanime') {
-    return witanimeAnimeInfo(animeId);
-  }
-
   const provider = getConsometProvider(providerId);
   const info = await provider.fetchAnimeInfo(animeId);
   return {
@@ -86,17 +67,6 @@ export async function consumetAnimeInfo(providerId, animeId) {
 
 export async function consumetEpisodeStream(providerId, episodeId) {
   assertWatchProvider(providerId);
-
-  // Route Witanime requests to our custom scraper
-  if (providerId === 'Witanime') {
-    try {
-      return await witanimeEpisodeStream(episodeId);
-    } catch (e) {
-      console.warn(`[consumet] Witanime stream failed, embed fallback: ${e.message}`);
-      return { url: episodeId, type: 'embed', subtitles: [] };
-    }
-  }
-
   const provider = getConsometProvider(providerId);
 
   try {

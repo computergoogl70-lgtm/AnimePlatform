@@ -123,7 +123,7 @@ export default function WatchPage() {
               <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-2xl bg-zinc-950 p-6 text-center ring-1 ring-white/10">
                 <p className="text-sm text-red-300">{streamError}</p>
                 <p className="max-w-md text-xs text-zinc-500">
-                  Use <strong className="text-zinc-300">AnimeSaturn (Italian - Recommended)</strong> when importing in Admin.
+                  Use <strong className="text-zinc-300">AnimeSaturn</strong> when importing episodes in Admin.
                   Delete bad episodes and re-import.
                 </p>
                 <button
