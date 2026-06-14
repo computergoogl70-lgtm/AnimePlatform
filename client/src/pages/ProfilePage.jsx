@@ -54,7 +54,7 @@ export default function ProfilePage() {
     try {
       await api.patch('/user/me', form);
       await refreshUser();
-      toast.success('Profile updated');
+      toast.success('تم تحديث الملف الشخصي');
     } catch (e) {
       toast.error(e.message);
     }
@@ -72,22 +72,22 @@ export default function ProfilePage() {
             className="h-28 w-28 rounded-2xl border border-white/10 bg-zinc-900 object-cover"
           />
           <div>
-            <h1 className="text-3xl font-black text-white">{user.displayName || 'Your profile'}</h1>
+            <h1 className="text-3xl font-black text-white">{user.displayName || 'ملفك الشخصي'}</h1>
             <p className="text-sm text-zinc-500">{user.email}</p>
-            <p className="mt-2 text-xs uppercase tracking-wide text-zinc-600">Role: {user.role}</p>
+            <p className="mt-2 text-xs uppercase tracking-wide text-zinc-600">الدور: {user.role === 'admin' ? 'مسؤول' : 'مستخدم'}</p>
           </div>
         </motion.div>
 
         <section className="grid gap-8 lg:grid-cols-2">
           <div className="glass space-y-4 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white">Account settings</h2>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-500">Display name</label>
+            <h2 className="text-lg font-bold text-white">إعدادات الحساب</h2>
+            <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-500">الاسم</label>
             <input
               value={form.displayName}
               onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
               className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none ring-red-500/30 focus:ring-2"
             />
-            <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-500">Avatar URL</label>
+            <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-500">رابط الصورة</label>
             <input
               value={form.avatarUrl}
               onChange={(e) => setForm((f) => ({ ...f, avatarUrl: e.target.value }))}
@@ -99,45 +99,45 @@ export default function ProfilePage() {
                 checked={form.autoPlayNext}
                 onChange={(e) => setForm((f) => ({ ...f, autoPlayNext: e.target.checked }))}
               />
-              Auto-play next episode
+              تشغيل الحلقة التالية تلقائياً
             </label>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-500">Preferred subtitles</label>
+            <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-500">الترجمة المفضلة</label>
             <select
               value={form.preferredSubtitleLang}
               onChange={(e) => setForm((f) => ({ ...f, preferredSubtitleLang: e.target.value }))}
               className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
             >
-              <option value="en">English</option>
-              <option value="ja">Japanese</option>
-              <option value="ar">Arabic</option>
+              <option value="en">الإنجليزية</option>
+              <option value="ja">اليابانية</option>
+              <option value="ar">العربية</option>
             </select>
             <button
               type="button"
               onClick={save}
               className="w-full rounded-xl bg-gradient-to-r from-[#ff4b5c] to-[#e50914] py-3 text-sm font-bold text-white shadow-lg shadow-red-900/30"
             >
-              Save changes
+              حفظ التغييرات
             </button>
           </div>
 
           <div className="space-y-6">
             <div className="glass rounded-2xl p-6">
-              <h2 className="text-lg font-bold text-white">Continue watching</h2>
+              <h2 className="text-lg font-bold text-white">متابعة المشاهدة</h2>
               <ul className="mt-4 space-y-3 text-sm">
-                {continueList.length === 0 && <li className="text-zinc-500">Nothing in progress.</li>}
+                {continueList.length === 0 && <li className="text-zinc-500">لا توجد حلقات قيد المشاهدة.</li>}
                 {continueList.map((row) => (
                   <li key={row._id}>
                     <Link className="text-red-300 hover:text-red-200" to={`/watch/${row.animeId?._id}/${row.episodeId?._id}`}>
-                      {row.animeId?.title} — Ep {row.episodeId?.number}
+                      {row.animeId?.title} — ح {row.episodeId?.number}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
             <div className="glass rounded-2xl p-6">
-              <h2 className="text-lg font-bold text-white">Favorites</h2>
+              <h2 className="text-lg font-bold text-white">المفضلة</h2>
               <ul className="mt-4 space-y-2 text-sm text-zinc-300">
-                {favorites.length === 0 && <li className="text-zinc-500">No favorites yet.</li>}
+                {favorites.length === 0 && <li className="text-zinc-500">لا توجد مفضلة بعد.</li>}
                 {favorites.map((a) => (
                   <li key={a._id}>
                     <Link className="hover:text-white" to={`/anime/${a._id}`}>
@@ -148,13 +148,13 @@ export default function ProfilePage() {
               </ul>
             </div>
             <div className="glass rounded-2xl p-6">
-              <h2 className="text-lg font-bold text-white">Watch history</h2>
+              <h2 className="text-lg font-bold text-white">سجل المشاهدة</h2>
               <ul className="mt-4 max-h-64 space-y-2 overflow-y-auto text-sm text-zinc-400">
-                {history.length === 0 && <li className="text-zinc-500">No history yet.</li>}
+                {history.length === 0 && <li className="text-zinc-500">لا يوجد سجل بعد.</li>}
                 {history.map((row) => (
                   <li key={row._id} className="flex justify-between gap-2">
                     <span className="truncate">{row.animeId?.title}</span>
-                    <span className="shrink-0 text-xs text-zinc-600">{new Date(row.lastWatchedAt).toLocaleDateString()}</span>
+                    <span className="shrink-0 text-xs text-zinc-600">{new Date(row.lastWatchedAt).toLocaleDateString('ar-SA')}</span>
                   </li>
                 ))}
               </ul>

@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { AdminRoute, PrivateRoute } from './components/ProtectedRoute.jsx';
+import './index.css';
 
 const LandingPage = lazy(() => import('./pages/LandingPage.jsx'));
 const AnimeDetailPage = lazy(() => import('./pages/AnimeDetailPage.jsx'));

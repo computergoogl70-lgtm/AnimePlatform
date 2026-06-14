@@ -26,7 +26,7 @@ export function AnimeCard({ anime, index = 0, preview = false, onImportMal }) {
       />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
       {anime.rating > 0 && (
-        <span className="absolute left-2 top-2 rounded-md bg-black/70 px-2 py-0.5 text-xs font-semibold text-amber-300">
+        <span className="absolute left-2 top-2 rtl:right-2 rounded-md bg-black/70 px-2 py-0.5 text-xs font-semibold text-amber-300">
           ★ {Number(anime.rating).toFixed(1)}
         </span>
       )}
@@ -53,7 +53,7 @@ export function AnimeCard({ anime, index = 0, preview = false, onImportMal }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
         transition={{ delay: index * 0.03 }}
-        className="relative w-44 shrink-0 sm:w-48 md:w-52"
+        className="relative w-44 shrink-0 sm:w-48 md:w-52 max-w-full"
       >
         <div className={`${wrapClass} flex flex-col`}>
           {cover}
@@ -67,7 +67,7 @@ export function AnimeCard({ anime, index = 0, preview = false, onImportMal }) {
                   rel="noopener noreferrer"
                   className="rounded-lg bg-white/10 py-2 text-center text-xs font-semibold text-white hover:bg-white/20"
                 >
-                  Open on MyAnimeList
+                  فتح على MyAnimeList
                 </a>
               )}
               {onImportMal && malId ? (
@@ -76,14 +76,14 @@ export function AnimeCard({ anime, index = 0, preview = false, onImportMal }) {
                   onClick={() => onImportMal(malId)}
                   className="rounded-lg bg-gradient-to-r from-[#ff4b5c] to-[#e50914] py-2 text-center text-xs font-bold text-white shadow-md shadow-red-900/30 hover:opacity-95"
                 >
-                  Add to my catalog
+                  إضافة إلى الكتالوج
                 </button>
               ) : null}
             </div>
           </div>
         </div>
-        <span className="pointer-events-none absolute right-2 top-2 rounded bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-200">
-          Not in catalog
+        <span className="pointer-events-none absolute right-2 top-2 rtl:left-2 rounded bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-200">
+          خارج الكتالوج
         </span>
       </motion.div>
     );
@@ -95,7 +95,7 @@ export function AnimeCard({ anime, index = 0, preview = false, onImportMal }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ delay: index * 0.03 }}
-      className="relative w-40 shrink-0 sm:w-44 md:w-48"
+      className="relative w-40 shrink-0 sm:w-44 md:w-48 max-w-full"
     >
       <Link to={`/anime/${id}`} className={wrapClass}>
         {cover}
@@ -107,7 +107,7 @@ export function AnimeCard({ anime, index = 0, preview = false, onImportMal }) {
 
 export function AnimeCardSkeleton() {
   return (
-    <div className="w-40 shrink-0 animate-pulse sm:w-44 md:w-48">
+    <div className="w-40 shrink-0 animate-pulse sm:w-44 md:w-48 max-w-full">
       <div className="overflow-hidden rounded-xl border border-white/5 bg-zinc-900/80">
         <div className="aspect-[2/3] bg-zinc-800" />
         <div className="space-y-2 p-3">

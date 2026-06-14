@@ -8,49 +8,44 @@ export function Footer() {
         <div className="max-w-sm space-y-3">
           <Logo />
           <p className="text-sm text-zinc-500">
-            Cinematic anime discovery and streaming UI. Streams are external URLs you control—never ship copyrighted video in this
-            repository.
+            منصة لاكتشاف ومشاهدة الأنمي. الروابط المستخدمة مصادر خارجية.
           </p>
         </div>
         <div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-3">
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-white">Browse</h4>
+            <h4 className="mb-3 text-sm font-semibold text-white">تصفح</h4>
             <ul className="space-y-2 text-sm text-zinc-400">
               <li>
                 <Link to="/search" className="hover:text-white">
-                  Search
+                  بحث
                 </Link>
               </li>
               <li>
                 <Link to="/" className="hover:text-white">
-                  Home
+                  الرئيسية
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-white">Account</h4>
+            <h4 className="mb-3 text-sm font-semibold text-white">الحساب</h4>
             <ul className="space-y-2 text-sm text-zinc-400">
               <li>
                 <Link to="/login" className="hover:text-white">
-                  Login
+                  دخول
                 </Link>
               </li>
               <li>
                 <Link to="/register" className="hover:text-white">
-                  Register
+                  إنشاء حساب
                 </Link>
               </li>
             </ul>
           </div>
-          <div>
-            <h4 className="mb-3 text-sm font-semibold text-white">Stack</h4>
-            <p className="text-sm text-zinc-500">React · Vite · Tailwind · Framer Motion · Express · MongoDB · JWT</p>
-          </div>
         </div>
       </div>
       <div className="border-t border-white/5 py-4 text-center text-xs text-zinc-600">
-        © {new Date().getFullYear()} AnimeStream — Academic / portfolio build.
+        © {new Date().getFullYear()} انمي ستريم
       </div>
     </footer>
   );

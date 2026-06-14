@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
       toast.success(data.message);
       if (data.demoToken) {
         setToken(data.demoToken);
-        toast('Dev reset token copied to field', { icon: '🔑' });
+        toast('تم نسخ رمز إعادة التعيين التلقائي', { icon: '🔑' });
       }
       setStep(2);
     } catch (err) {
@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
         animate={{ opacity: 1, y: 0 }}
         className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950/80 p-8 shadow-2xl shadow-black/60 backdrop-blur-xl"
       >
-        <h1 className="text-center text-2xl font-black text-white">Reset password</h1>
+        <h1 className="text-center text-2xl font-black text-white">إعادة تعيين كلمة المرور</h1>
         {step === 1 && (
           <form onSubmit={request} className="mt-8 space-y-4">
             <input
@@ -56,18 +56,17 @@ export default function ForgotPasswordPage() {
               placeholder="you@example.com"
             />
             <button type="submit" className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-500">
-              Send reset link
+              إرسال رابط إعادة التعيين
             </button>
           </form>
         )}
         {step === 2 && (
           <form onSubmit={reset} className="mt-8 space-y-4">
-            <p className="text-xs text-zinc-500">In development, the API may return a demo token. Paste the emailed token here in production.</p>
             <input
               value={token}
               onChange={(e) => setToken(e.target.value)}
               className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm text-white outline-none ring-red-500/30 focus:ring-2"
-              placeholder="Reset token"
+              placeholder="رمز إعادة التعيين"
             />
             <input
               type="password"
@@ -76,17 +75,17 @@ export default function ForgotPasswordPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm text-white outline-none ring-red-500/30 focus:ring-2"
-              placeholder="New password"
+              placeholder="كلمة المرور الجديدة"
             />
             <button type="submit" className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-500">
-              Update password
+              تحديث كلمة المرور
             </button>
           </form>
         )}
-        {step === 3 && <p className="mt-6 text-center text-sm text-emerald-400">You can sign in with your new password.</p>}
+        {step === 3 && <p className="mt-6 text-center text-sm text-emerald-400">يمكنك تسجيل الدخول بكلمة المرور الجديدة.</p>}
         <p className="mt-6 text-center text-sm text-zinc-500">
           <Link to="/login" className="text-red-400 hover:text-red-300">
-            Back to login
+            العودة إلى تسجيل الدخول
           </Link>
         </p>
       </motion.div>

@@ -6,12 +6,12 @@ import { VideoPlayer } from '../components/VideoPlayer.jsx';
 import toast from 'react-hot-toast';
 
 const tabs = [
-  { id: 'import', label: 'Import (Jikan)' },
-  { id: 'anime', label: 'Anime' },
-  { id: 'episodes', label: 'Episodes' },
-  { id: 'users', label: 'Users' },
-  { id: 'banners', label: 'Banners' },
-  { id: 'sections', label: 'Home sections' },
+  { id: 'import', label: 'استيراد (Jikan)' },
+  { id: 'anime', label: 'الأنمي' },
+  { id: 'episodes', label: 'الحلقات' },
+  { id: 'users', label: 'المستخدمون' },
+  { id: 'banners', label: 'اللافتات' },
+  { id: 'sections', label: 'أقسام الرئيسية' },
 ];
 
 export default function AdminDashboardPage() {
@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
   const importMal = async () => {
     try {
       const { data } = await api.post('/admin/anime/import-jikan', { malId: Number(malId) });
-      toast.success(`Imported ${data.anime.title}`);
+      toast.success(`تم استيراد ${data.anime.title}`);
       await loadAnime();
     } catch (e) {
       toast.error(e.message);
@@ -104,7 +104,7 @@ export default function AdminDashboardPage() {
   const createEpisode = async (e) => {
     e.preventDefault();
     if (!selectedAnime) {
-      toast.error('Pick an anime');
+      toast.error('اختر أنمي');
       return;
     }
     try {
@@ -113,7 +113,7 @@ export default function AdminDashboardPage() {
         videoUrl: episodeForm.streamUrl,
         streamSource: 'url',
       });
-      toast.success('Episode created');
+      toast.success('تم إنشاء الحلقة');
       setPreviewUrl('');
       setEpisodeForm((f) => ({ ...f, number: f.number + 1, title: '' }));
       await loadEpisodes(selectedAnime);
@@ -123,10 +123,10 @@ export default function AdminDashboardPage() {
   };
 
   const deleteEpisode = async (episodeId) => {
-    if (!confirm('Delete this episode?')) return;
+    if (!confirm('حذف هذه الحلقة؟')) return;
     try {
       await api.delete(`/admin/episodes/${episodeId}`);
-      toast.success('Episode deleted');
+      toast.success('تم حذف الحلقة');
       await loadEpisodes(selectedAnime);
     } catch (e) {
       toast.error(e.message);
@@ -137,7 +137,7 @@ export default function AdminDashboardPage() {
     if (!consumetQuery.trim()) return;
     setConsumetBusy(true);
     setConsumetResults([]);
-    const loadingToast = toast.loading(`Searching ${consumetProvider} for "${consumetQuery.trim()}"…`);
+    const loadingToast = toast.loading(`جارٍ البحث في ${consumetProvider} عن "${consumetQuery.trim()}"…`);
     try {
       const { data } = await api.get('/admin/consumet/search', {
         params: { provider: consumetProvider, q: consumetQuery.trim() },
@@ -146,12 +146,12 @@ export default function AdminDashboardPage() {
       const results = data.data || [];
       setConsumetResults(results);
       if (results.length === 0) {
-        toast.error('No results found — try a different spelling or provider.', { id: loadingToast });
+        toast.error('لم يتم العثور على نتائج — جرب كتابة مختلفة.', { id: loadingToast });
       } else {
-        toast.success(`Found ${results.length} result${results.length !== 1 ? 's' : ''}`, { id: loadingToast });
+        toast.success(`تم العثور على ${results.length} نتيجة`, { id: loadingToast });
       }
     } catch (e) {
-      toast.error(e.message || 'Search failed', { id: loadingToast });
+      toast.error(e.message || 'فشل البحث', { id: loadingToast });
       setConsumetResults([]);
     } finally {
       setConsumetBusy(false);
@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
 
   const importConsumetEpisodes = async (consumetAnimeId) => {
     if (!selectedAnime) {
-      toast.error('Select a catalog anime first (dropdown below)');
+      toast.error('اختر أنمي من الكتالوج أولاً');
       return;
     }
     setConsumetBusy(true);
@@ -170,7 +170,7 @@ export default function AdminDashboardPage() {
         consumetAnimeId,
         season: episodeForm.season,
       });
-      toast.success(`Imported ${data.created} episodes (${data.skipped?.length || 0} skipped as duplicates)`);
+      toast.success(`تم استيراد ${data.created} حلقة (تم تخطي ${data.skipped?.length || 0} مكررة)`);
       await loadEpisodes(selectedAnime);
       await loadAnime();
     } catch (e) {
@@ -181,10 +181,10 @@ export default function AdminDashboardPage() {
   };
 
   const deleteAnime = async (id) => {
-    if (!confirm('Delete anime and episodes?')) return;
+    if (!confirm('حذف الأنمي وجميع الحلقات؟')) return;
     try {
       await api.delete(`/admin/anime/${id}`);
-      toast.success('Deleted');
+      toast.success('تم الحذف');
       await loadAnime();
     } catch (e) {
       toast.error(e.message);
@@ -195,8 +195,8 @@ export default function AdminDashboardPage() {
     <AppShell showSidebar={false}>
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 lg:px-8">
         <div>
-          <h1 className="text-3xl font-black text-white">Admin dashboard</h1>
-          <p className="text-sm text-zinc-500">Manage catalog, streams, homepage, and users.</p>
+          <h1 className="text-3xl font-black text-white">لوحة التحكم</h1>
+          <p className="text-sm text-zinc-500">إدارة الكتالوج، البث، الصفحة الرئيسية، والمستخدمين.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {tabs.map((t) => (
@@ -215,8 +215,8 @@ export default function AdminDashboardPage() {
 
         {tab === 'import' && (
           <div className="glass space-y-4 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white">Import from MyAnimeList (Jikan)</h2>
-            <p className="text-sm text-zinc-500">Enter a numeric MAL ID (example: 16498 = Attack on Titan).</p>
+            <h2 className="text-lg font-bold text-white">استيراد من MyAnimeList (Jikan)</h2>
+            <p className="text-sm text-zinc-500">أدخل رقم MAL (مثال: 16498 = Attack on Titan).</p>
             <div className="flex flex-wrap gap-3">
               <input
                 value={malId}
@@ -224,7 +224,7 @@ export default function AdminDashboardPage() {
                 className="w-40 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
               />
               <button type="button" onClick={importMal} className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white">
-                Import metadata
+                استيراد البيانات
               </button>
             </div>
           </div>
@@ -233,30 +233,30 @@ export default function AdminDashboardPage() {
         {tab === 'anime' && (
           <div className="glass space-y-4 rounded-2xl p-6">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-bold text-white">Anime catalog</h2>
+              <h2 className="text-lg font-bold text-white">كتالوج الأنمي</h2>
               <button type="button" onClick={loadAnime} className="text-sm text-red-300 hover:text-red-200">
-                Refresh
+                تحديث
               </button>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm text-zinc-300">
                 <thead className="text-xs uppercase text-zinc-500">
                   <tr>
-                    <th className="py-2">Title</th>
+                    <th className="py-2">العنوان</th>
                     <th className="py-2">MAL</th>
-                    <th className="py-2">Rating</th>
+                    <th className="py-2">التقييم</th>
                     <th className="py-2" />
                   </tr>
                 </thead>
                 <tbody>
                   {animeList.map((a) => (
                     <tr key={a._id} className="border-t border-white/5">
-                      <td className="py-2 pr-4">{a.title}</td>
+                      <td className="py-2 pl-4">{a.title}</td>
                       <td className="py-2">{a.malId || '—'}</td>
                       <td className="py-2">{a.rating?.toFixed?.(1) || '—'}</td>
-                      <td className="py-2 text-right">
+                      <td className="py-2 text-left">
                         <button type="button" className="text-red-400 hover:text-red-300" onClick={() => deleteAnime(a._id)}>
-                          Delete
+                          حذف
                         </button>
                       </td>
                     </tr>
@@ -270,7 +270,7 @@ export default function AdminDashboardPage() {
         {tab === 'episodes' && (
           <motion.div className="space-y-6">
             <div className="glass space-y-4 rounded-2xl p-6">
-              <h2 className="text-lg font-bold text-white">Target catalog anime</h2>
+              <h2 className="text-lg font-bold text-white">اختيار الأنمي المستهدف</h2>
               <select
                 value={selectedAnime}
                 onChange={(e) => {
@@ -279,7 +279,7 @@ export default function AdminDashboardPage() {
                 }}
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
               >
-                <option value="">Select anime…</option>
+                <option value="">اختر أنمي…</option>
                 {animeList.map((a) => (
                   <option key={a._id} value={a._id}>
                     {a.title}
@@ -289,9 +289,9 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="glass space-y-4 rounded-2xl p-6">
-              <h2 className="text-lg font-bold text-white">Import episodes via Consumet</h2>
+              <h2 className="text-lg font-bold text-white">استيراد حلقات عبر Consumet</h2>
               <p className="text-sm text-zinc-500">
-                Import episodes from Consumet providers. Streams are resolved when users watch.
+                استيراد الحلقات من مزودي Consumet. يتم حل روابط البث عند المشاهدة.
               </p>
               <motion.div className="flex flex-wrap gap-3">
                 <select
@@ -311,7 +311,7 @@ export default function AdminDashboardPage() {
                   value={consumetQuery}
                   onChange={(e) => setConsumetQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), searchConsumet())}
-                  placeholder="Search on provider…"
+                  placeholder="ابحث في المزود…"
                   className="min-w-[200px] flex-1 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
                 />
                 <button
@@ -320,7 +320,7 @@ export default function AdminDashboardPage() {
                   onClick={searchConsumet}
                   className="rounded-xl bg-zinc-800 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700 disabled:opacity-50"
                 >
-                  {consumetBusy ? 'Searching…' : 'Search'}
+                  {consumetBusy ? 'جارٍ البحث…' : 'بحث'}
                 </button>
               </motion.div>
               {consumetResults.length > 0 && (
@@ -334,7 +334,7 @@ export default function AdminDashboardPage() {
                         {r.image && <img src={r.image} alt="" className="h-12 w-8 rounded object-cover" />}
                         <div>
                           <p className="font-semibold text-white">{r.title}</p>
-                          <p className="text-xs text-zinc-500">{r.episodes ? `${r.episodes} episodes` : ''}</p>
+                          <p className="text-xs text-zinc-500">{r.episodes ? `${r.episodes} حلقة` : ''}</p>
                         </div>
                       </div>
                       <button
@@ -343,7 +343,7 @@ export default function AdminDashboardPage() {
                         onClick={() => importConsumetEpisodes(r.id)}
                         className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-500 disabled:opacity-40"
                       >
-                        Import episodes
+                        استيراد الحلقات
                       </button>
                     </li>
                   ))}
@@ -354,17 +354,17 @@ export default function AdminDashboardPage() {
             {selectedAnime && (
               <div className="glass rounded-2xl p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-white">Episodes in catalog</h2>
+                  <h2 className="text-lg font-bold text-white">الحلقات في الكتالوج</h2>
                   <button
                     type="button"
                     onClick={() => loadEpisodes(selectedAnime)}
                     className="text-sm text-red-300 hover:text-red-200"
                   >
-                    Refresh
+                    تحديث
                   </button>
                 </div>
                 {episodes.length === 0 ? (
-                  <p className="text-sm text-zinc-500">No episodes yet.</p>
+                  <p className="text-sm text-zinc-500">لا توجد حلقات بعد.</p>
                 ) : (
                   <ul className="max-h-80 space-y-2 overflow-y-auto text-sm">
                     {episodes.map((ep) => (
@@ -373,9 +373,9 @@ export default function AdminDashboardPage() {
                         className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 py-2"
                       >
                         <span className="text-zinc-300">
-                          S{ep.season} E{ep.number} — {ep.title || 'Untitled'}
+                          م{ep.season} ح{ep.number} — {ep.title || 'بدون عنوان'}
                           {ep.streamSource === 'consumet' && (
-                            <span className="ml-2 rounded bg-amber-900/40 px-1.5 py-0.5 text-[10px] uppercase text-amber-200">
+                            <span className="mr-2 rtl:ml-2 rounded bg-amber-900/40 px-1.5 py-0.5 text-[10px] uppercase text-amber-200">
                               consumet
                             </span>
                           )}
@@ -385,7 +385,7 @@ export default function AdminDashboardPage() {
                           className="text-red-400 hover:text-red-300"
                           onClick={() => deleteEpisode(ep._id)}
                         >
-                          Delete
+                          حذف
                         </button>
                       </li>
                     ))}
@@ -395,7 +395,7 @@ export default function AdminDashboardPage() {
             )}
 
             <form onSubmit={createEpisode} className="glass space-y-4 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white">Add one episode (manual URL)</h2>
+            <h2 className="text-lg font-bold text-white">إضافة حلقة يدوياً</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <input
                 type="number"
@@ -403,7 +403,7 @@ export default function AdminDashboardPage() {
                 value={episodeForm.season}
                 onChange={(e) => setEpisodeForm((f) => ({ ...f, season: Number(e.target.value) }))}
                 className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
-                placeholder="Season"
+                placeholder="الموسم"
               />
               <input
                 type="number"
@@ -411,20 +411,20 @@ export default function AdminDashboardPage() {
                 value={episodeForm.number}
                 onChange={(e) => setEpisodeForm((f) => ({ ...f, number: Number(e.target.value) }))}
                 className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
-                placeholder="Number"
+                placeholder="الرقم"
               />
             </div>
             <input
               value={episodeForm.title}
               onChange={(e) => setEpisodeForm((f) => ({ ...f, title: e.target.value }))}
               className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
-              placeholder="Episode title"
+              placeholder="عنوان الحلقة"
             />
             <textarea
               value={episodeForm.description}
               onChange={(e) => setEpisodeForm((f) => ({ ...f, description: e.target.value }))}
               className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
-              placeholder="Synopsis"
+              placeholder="الوصف"
               rows={3}
             />
             <div className="flex gap-2">
@@ -432,23 +432,23 @@ export default function AdminDashboardPage() {
                 value={episodeForm.streamUrl}
                 onChange={(e) => setEpisodeForm((f) => ({ ...f, streamUrl: e.target.value, videoUrl: e.target.value }))}
                 className="flex-1 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
-                placeholder="Enter video, stream, or iframe/embed URL..."
+                placeholder="أدخل رابط الفيديو أو البث..."
                 required
               />
               <button
                 type="button"
                 onClick={() => {
                   if (!episodeForm.streamUrl) {
-                    toast.error('Enter a URL first');
+                    toast.error('أدخل رابطاً أولاً');
                     return;
                   }
                   setPreviewUrl(episodeForm.streamUrl);
                   setPreviewType(episodeForm.sourceType);
-                  toast.success('Loading preview player...');
+                  toast.success('جارٍ تحميل معاينة المشغل...');
                 }}
                 className="rounded-xl bg-zinc-800 px-4 text-xs font-semibold text-white hover:bg-zinc-700"
               >
-                Preview
+                معاينة
               </button>
             </div>
             
@@ -458,12 +458,12 @@ export default function AdminDashboardPage() {
                 onChange={(e) => setEpisodeForm((f) => ({ ...f, sourceType: e.target.value }))}
                 className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
               >
-                <option value="auto">Auto Detect Source</option>
-                <option value="mp4">Direct MP4 URL</option>
-                <option value="m3u8">HLS / M3U8 Stream</option>
-                <option value="embed">Embed / Iframe Link</option>
-                <option value="iframe">Iframe Provider Link</option>
-                <option value="external">External Page Redirect</option>
+                <option value="auto">كشف المصدر تلقائياً</option>
+                <option value="mp4">رابط MP4 مباشر</option>
+                <option value="m3u8">بث HLS / M3U8</option>
+                <option value="embed">رابط تضمين / Iframe</option>
+                <option value="iframe">رابط مزود Iframe</option>
+                <option value="external">إعادة توجيه لصفحة خارجية</option>
               </select>
 
               <input
@@ -471,20 +471,20 @@ export default function AdminDashboardPage() {
                 value={episodeForm.durationSeconds}
                 onChange={(e) => setEpisodeForm((f) => ({ ...f, durationSeconds: Number(e.target.value) }))}
                 className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
-                placeholder="Duration (seconds)"
+                placeholder="المدة (بالثواني)"
               />
             </div>
 
             {previewUrl && (
               <div className="space-y-2 rounded-xl bg-black/50 p-3 border border-white/5">
                 <div className="flex items-center justify-between text-xs text-zinc-400">
-                  <span>Player Real-time Preview ({previewType === 'auto' ? 'Auto-detected' : previewType})</span>
+                  <span>معاينة المشغل ({previewType === 'auto' ? 'كشف تلقائي' : previewType})</span>
                   <button
                     type="button"
                     onClick={() => setPreviewUrl('')}
                     className="text-red-400 hover:text-red-300"
                   >
-                    Close
+                    إغلاق
                   </button>
                 </div>
                 <VideoPlayer src={previewUrl} type={previewType} />
@@ -492,7 +492,7 @@ export default function AdminDashboardPage() {
             )}
 
             <button type="submit" className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99] hover:bg-red-500">
-              Save episode
+              حفظ الحلقة
             </button>
           </form>
           </motion.div>
@@ -500,12 +500,12 @@ export default function AdminDashboardPage() {
 
         {tab === 'users' && (
           <div className="glass rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white">Users</h2>
+            <h2 className="text-lg font-bold text-white">المستخدمون</h2>
             <ul className="mt-4 space-y-2 text-sm text-zinc-300">
               {users.map((u) => (
                 <li key={u._id} className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 py-2">
                   <span>
-                    {u.email} — <span className="text-zinc-500">{u.role}</span>
+                    {u.email} — <span className="text-zinc-500">{u.role === 'admin' ? 'مسؤول' : 'مستخدم'}</span>
                   </span>
                   <button
                     type="button"
@@ -513,11 +513,11 @@ export default function AdminDashboardPage() {
                     onClick={async () => {
                       const next = u.role === 'admin' ? 'user' : 'admin';
                       await api.patch(`/admin/users/${u._id}`, { role: next });
-                      toast.success('Role updated');
+                      toast.success('تم تحديث الدور');
                       loadUsers();
                     }}
                   >
-                    Toggle admin
+                    تبديل صلاحية المسؤول
                   </button>
                 </li>
               ))}
@@ -527,7 +527,7 @@ export default function AdminDashboardPage() {
 
         {tab === 'banners' && (
           <div className="glass space-y-4 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white">Hero banners</h2>
+            <h2 className="text-lg font-bold text-white">لافتات الصفحة الرئيسية</h2>
             <form
               className="space-y-3"
               onSubmit={async (e) => {
@@ -539,21 +539,21 @@ export default function AdminDashboardPage() {
                   order: Number(fd.get('order') || 0),
                   active: true,
                 });
-                toast.success('Banner added');
+                toast.success('تمت إضافة اللافتة');
                 e.target.reset();
                 loadBanners();
               }}
             >
-              <input name="title" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="Title" />
+              <input name="title" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="العنوان" />
               <input
                 name="imageUrl"
                 required
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
-                placeholder="Image URL"
+                placeholder="رابط الصورة"
               />
-              <input name="order" type="number" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="Order" />
+              <input name="order" type="number" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="الترتيب" />
               <button type="submit" className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white">
-                Add banner
+                إضافة لافتة
               </button>
             </form>
             <ul className="space-y-2 text-sm text-zinc-400">
@@ -561,7 +561,7 @@ export default function AdminDashboardPage() {
                 <li key={b._id} className="flex items-center justify-between gap-2">
                   <span className="truncate">{b.title || b.imageUrl}</span>
                   <button type="button" className="text-red-400" onClick={() => api.delete(`/admin/banners/${b._id}`).then(loadBanners)}>
-                    Remove
+                    إزالة
                   </button>
                 </li>
               ))}
@@ -571,8 +571,8 @@ export default function AdminDashboardPage() {
 
         {tab === 'sections' && (
           <div className="glass space-y-4 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white">Homepage rows</h2>
-            <p className="text-sm text-zinc-500">Rows pull live data for trending, ratings, recency, or a genre.</p>
+            <h2 className="text-lg font-bold text-white">أقسام الصفحة الرئيسية</h2>
+            <p className="text-sm text-zinc-500">الأقسام تسحب البيانات مباشرة من التصنيفات والتقييمات.</p>
             <form
               className="space-y-3"
               onSubmit={async (e) => {
@@ -586,24 +586,24 @@ export default function AdminDashboardPage() {
                   order: Number(fd.get('order') || 0),
                   active: true,
                 });
-                toast.success('Section saved');
+                toast.success('تم حفظ القسم');
                 e.target.reset();
                 loadSections();
               }}
             >
-              <input name="key" required className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="unique-key" />
-              <input name="title" required className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="Row title" />
+              <input name="key" required className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="معرّف فريد" />
+              <input name="title" required className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="عنوان القسم" />
               <select name="type" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white">
-                <option value="trending">Trending</option>
-                <option value="top_rated">Top rated</option>
-                <option value="recent">Recently added</option>
-                <option value="genre">Genre spotlight</option>
-                <option value="custom">Custom IDs (advanced)</option>
+                <option value="trending">الأكثر مشاهدة</option>
+                <option value="top_rated">الأعلى تقييماً</option>
+                <option value="recent">أُضيف مؤخراً</option>
+                <option value="genre">تصنيف مميز</option>
+                <option value="custom">معرّفات مخصصة</option>
               </select>
-              <input name="genre" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="Genre (for genre type)" />
-              <input name="order" type="number" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="Order" />
+              <input name="genre" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="التصنيف (لنوع التصنيف)" />
+              <input name="order" type="number" className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="الترتيب" />
               <button type="submit" className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white">
-                Add section
+                إضافة قسم
               </button>
             </form>
             <ul className="space-y-2 text-sm text-zinc-400">
@@ -613,7 +613,7 @@ export default function AdminDashboardPage() {
                     {s.title} ({s.type})
                   </span>
                   <button type="button" className="text-red-400" onClick={() => api.delete(`/admin/sections/${s._id}`).then(loadSections)}>
-                    Remove
+                    إزالة
                   </button>
                 </li>
               ))}

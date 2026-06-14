@@ -101,7 +101,7 @@ export default function WatchPage() {
       await api.post(`/anime/${animeId}/comments`, { text: commentText, episodeId });
       setCommentText('');
       await loadComments();
-      toast.success('Comment posted');
+      toast.success('تم نشر التعليق');
     } catch (e) {
       toast.error(e.message);
     }
@@ -123,15 +123,15 @@ export default function WatchPage() {
               <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-2xl bg-zinc-950 p-6 text-center ring-1 ring-white/10">
                 <p className="text-sm text-red-300">{streamError}</p>
                 <p className="max-w-md text-xs text-zinc-500">
-                  Use <strong className="text-zinc-300">AnimeSaturn</strong> when importing episodes in Admin.
-                  Delete bad episodes and re-import.
+                  استخدم <strong className="text-zinc-300">AnimeSaturn</strong> عند استيراد الحلقات.
+                  احذف الحلقات المعطوبة وأعد الاستيراد.
                 </p>
                 <button
                   type="button"
                   onClick={loadStream}
                   className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
                 >
-                  Retry stream
+                  إعادة المحاولة
                 </button>
               </div>
             )}
@@ -155,12 +155,12 @@ export default function WatchPage() {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-red-400">
-                  Episode {episode?.number}
-                  {episode?.season ? ` · Season ${episode.season}` : ''}
+                  الحلقة {episode?.number}
+                  {episode?.season ? ` · الموسم ${episode.season}` : ''}
                 </p>
-                <h1 className="text-2xl font-bold text-white md:text-3xl">{episode?.title || 'Episode'}</h1>
+                <h1 className="text-2xl font-bold text-white md:text-3xl">{episode?.title || 'حلقة'}</h1>
                 <p className="mt-1 text-sm text-zinc-500">
-                  {anime?.title} · {episode?.durationSeconds ? `${Math.round(episode.durationSeconds / 60)} min` : ''}
+                  {anime?.title} · {episode?.durationSeconds ? `${Math.round(episode.durationSeconds / 60)} دقيقة` : ''}
                 </p>
               </div>
               <button
@@ -168,13 +168,13 @@ export default function WatchPage() {
                 onClick={() => navigate(-1)}
                 className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-zinc-200 hover:bg-white/10"
               >
-                ✕ Close
+                ✕ إغلاق
               </button>
             </div>
 
             <section className="glass rounded-2xl p-5">
-              <h3 className="text-sm font-semibold text-white">Episode description</h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-400">{episode?.description || 'No synopsis for this episode.'}</p>
+              <h3 className="text-sm font-semibold text-white">وصف الحلقة</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-400">{episode?.description || 'لا توجد ملخصات لهذه الحلقة.'}</p>
             </section>
 
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -184,7 +184,7 @@ export default function WatchPage() {
                 onClick={() => prevEp && navigate(`/watch/${animeId}/${prevEp._id}`)}
                 className="text-sm text-zinc-400 hover:text-white disabled:opacity-30"
               >
-                ‹ Previous
+                › السابقة
               </button>
               <p className="text-sm text-zinc-500">
                 {index + 1} / {episodes.length || '—'}
@@ -195,12 +195,12 @@ export default function WatchPage() {
                 onClick={() => nextEp && navigate(`/watch/${animeId}/${nextEp._id}`)}
                 className="rounded-xl bg-gradient-to-r from-[#ff4b5c] to-[#e50914] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-red-900/30 disabled:opacity-30"
               >
-                Next ›
+                التالية ‹
               </button>
             </div>
 
             <section>
-              <h3 className="mb-3 text-lg font-bold text-white">Episode list</h3>
+              <h3 className="mb-3 text-lg font-bold text-white">قائمة الحلقات</h3>
               <div className="scrollbar-thin flex flex-wrap gap-2">
                 {episodes.map((ep) => (
                   <Link
@@ -210,37 +210,37 @@ export default function WatchPage() {
                       ep._id === episodeId ? 'bg-red-600 text-white' : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800'
                     }`}
                   >
-                    Ep {ep.number}
+                    ح {ep.number}
                   </Link>
                 ))}
               </div>
             </section>
 
             <section className="glass rounded-2xl p-5">
-              <h3 className="text-lg font-bold text-white">Discussion</h3>
+              <h3 className="text-lg font-bold text-white">النقاش</h3>
               <div className="mt-4 space-y-3">
                 <textarea
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   rows={3}
                   className="w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm text-white outline-none ring-red-500/30 focus:ring-2"
-                  placeholder="Share your thoughts…"
+                  placeholder="شاركنا رأيك…"
                 />
                 <button
                   type="button"
                   onClick={postComment}
                   className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
                 >
-                  Post comment
+                  نشر تعليق
                 </button>
               </div>
               <ul className="mt-6 space-y-4">
                 {comments.map((c) => (
                   <li key={c._id} className="border-b border-white/5 pb-4 last:border-0">
                     <div className="flex items-center gap-2 text-xs text-zinc-500">
-                      <span className="font-semibold text-zinc-200">{c.userId?.displayName || 'User'}</span>
+                      <span className="font-semibold text-zinc-200">{c.userId?.displayName || 'مستخدم'}</span>
                       <span>·</span>
-                      <span>{new Date(c.createdAt).toLocaleString()}</span>
+                      <span>{new Date(c.createdAt).toLocaleDateString('ar-SA')}</span>
                     </div>
                     <p className="mt-2 text-sm text-zinc-300">{c.text}</p>
                   </li>
@@ -251,7 +251,7 @@ export default function WatchPage() {
 
           <aside className="space-y-4">
             <div className="glass rounded-2xl p-4">
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">Related</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">ذات صلة</h3>
               <ul className="mt-3 space-y-3">
                 {recs.slice(0, 8).map((a) => (
                   <li key={a._id}>
@@ -274,7 +274,7 @@ export default function WatchPage() {
               </ul>
             </div>
             <motion.div layout className="glass rounded-2xl p-4 text-xs text-zinc-500">
-              Streams load only after a signed-in request. Configure licensed HLS or MP4 URLs per episode in the admin panel.
+              يتم تحميل البث فقط بعد تسجيل الدخول. قم بتكوين روابط HLS أو MP4 لكل حلقة من لوحة التحكم.
             </motion.div>
           </aside>
         </div>

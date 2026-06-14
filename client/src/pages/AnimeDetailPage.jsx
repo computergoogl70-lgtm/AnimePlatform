@@ -52,7 +52,7 @@ export default function AnimeDetailPage() {
 
   const toggleFavorite = async () => {
     if (!user) {
-      toast.error('Sign in to save favorites');
+      toast.error('سجل الدخول لحفظ المفضلة');
       navigate('/login');
       return;
     }
@@ -60,11 +60,11 @@ export default function AnimeDetailPage() {
       if (data.isFavorite) {
         await api.delete(`/user/favorites/${id}`);
         setData((d) => ({ ...d, isFavorite: false }));
-        toast.success('Removed from favorites');
+        toast.success('أُزيل من المفضلة');
       } else {
         await api.post(`/user/favorites/${id}`);
         setData((d) => ({ ...d, isFavorite: true }));
-        toast.success('Saved to favorites');
+        toast.success('أُضيف إلى المفضلة');
       }
     } catch (e) {
       toast.error(e.message);
@@ -98,7 +98,7 @@ export default function AnimeDetailPage() {
                 />
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-md bg-red-600 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">Series</span>
+                    <span className="rounded-md bg-red-600 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">مسلسل</span>
                     {anime.genres?.map((g) => (
                       <span key={g} className="rounded-full border border-white/10 bg-black/40 px-3 py-0.5 text-xs text-zinc-300">
                         {g}
@@ -109,7 +109,7 @@ export default function AnimeDetailPage() {
                   <div className="flex flex-wrap gap-3 text-sm text-zinc-300">
                     {anime.rating > 0 && <span className="font-semibold text-amber-300">★ {anime.rating.toFixed(1)}</span>}
                     <span>{anime.year || '—'}</span>
-                    <span>{anime.episodeCount || episodes.length} episodes</span>
+                    <span>{anime.episodeCount || episodes.length} حلقة</span>
                     <span>{anime.status}</span>
                   </div>
                   <p className="max-w-3xl text-sm leading-relaxed text-zinc-300 md:text-base">{anime.description}</p>
@@ -120,7 +120,7 @@ export default function AnimeDetailPage() {
                       onClick={() => firstEp && navigate(`/watch/${id}/${firstEp._id}`)}
                       className="rounded-xl bg-gradient-to-r from-[#ff4b5c] to-[#e50914] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-900/40 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      ▶ Watch
+                      ▶ شاهد
                     </button>
                     {anime.trailerUrl && (
                       <button
@@ -128,7 +128,7 @@ export default function AnimeDetailPage() {
                         onClick={() => setTrailerOpen(true)}
                         className="rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-md hover:bg-white/10"
                       >
-                        Trailer
+                        الإعلان الدعائي
                       </button>
                     )}
                     <button
@@ -138,7 +138,7 @@ export default function AnimeDetailPage() {
                         data.isFavorite ? 'border-red-500 bg-red-500/10 text-red-300' : 'border-white/15 bg-white/5 text-white hover:bg-white/10'
                       }`}
                     >
-                      ♥ Favorite
+                      ♥ المفضلة
                     </button>
                   </div>
                 </div>
@@ -149,9 +149,9 @@ export default function AnimeDetailPage() {
           <div className="mx-auto max-w-7xl space-y-10 px-4 py-10 lg:px-8">
             <section>
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white">Episodes</h2>
+                <h2 className="text-xl font-bold text-white">الحلقات</h2>
                 <p className="text-sm text-zinc-500">
-                  {seasons.length > 1 ? `Seasons: ${seasons.join(', ')}` : 'Season 1'}
+                  {seasons.length > 1 ? `المواسم: ${seasons.join(', ')}` : 'الموسم 1'}
                 </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -165,8 +165,8 @@ export default function AnimeDetailPage() {
                       {ep.number}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-white group-hover:text-red-200">{ep.title || `Episode ${ep.number}`}</p>
-                      <p className="line-clamp-2 text-xs text-zinc-500">{ep.description || 'Watch now'}</p>
+                      <p className="truncate text-sm font-semibold text-white group-hover:text-red-200">{ep.title || `الحلقة ${ep.number}`}</p>
+                      <p className="line-clamp-2 text-xs text-zinc-500">{ep.description || 'شاهد الآن'}</p>
                     </div>
                   </Link>
                 ))}
@@ -174,7 +174,7 @@ export default function AnimeDetailPage() {
             </section>
 
             <section>
-              <h2 className="mb-4 text-xl font-bold text-white">Recommended</h2>
+              <h2 className="mb-4 text-xl font-bold text-white">اقتراحات</h2>
               <div className="scrollbar-thin flex gap-4 overflow-x-auto pb-2">
                 {recs.map((a, i) => (
                   <AnimeCard key={a._id} anime={a} index={i} />
@@ -202,7 +202,7 @@ export default function AnimeDetailPage() {
             >
               <button
                 type="button"
-                className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-3 py-1 text-sm text-white hover:bg-black"
+                className="absolute left-3 top-3 rtl:right-3 z-10 rounded-full bg-black/60 px-3 py-1 text-sm text-white hover:bg-black"
                 onClick={() => setTrailerOpen(false)}
               >
                 ✕

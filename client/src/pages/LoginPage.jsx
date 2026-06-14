@@ -18,7 +18,7 @@ export default function LoginPage() {
     setBusy(true);
     try {
       await login(email, password);
-      toast.success('Welcome back');
+      toast.success('مرحباً بعودتك');
       navigate(from, { replace: true });
     } catch (err) {
       toast.error(err.message);
@@ -38,11 +38,11 @@ export default function LoginPage() {
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#ff4b5c] to-[#e50914] text-2xl text-white shadow-lg shadow-red-900/40">
           ⎆
         </div>
-        <h1 className="text-center text-2xl font-black text-white">Welcome back</h1>
-        <p className="mt-2 text-center text-sm text-zinc-500">Sign in to continue your session</p>
+        <h1 className="text-center text-2xl font-black text-white">مرحباً بعودتك</h1>
+        <p className="mt-2 text-center text-sm text-zinc-500">سجل الدخول لاستكمال مشاهدتك</p>
         <form onSubmit={submit} className="mt-8 space-y-4">
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Email</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">البريد الإلكتروني</label>
             <input
               type="email"
               required
@@ -53,7 +53,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Password</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">كلمة المرور</label>
             <input
               type="password"
               required
@@ -69,17 +69,14 @@ export default function LoginPage() {
             disabled={busy}
             className="mt-2 w-full rounded-xl bg-gradient-to-r from-[#ff4b5c] to-[#e50914] py-3 text-sm font-bold text-white shadow-lg shadow-red-900/40 disabled:opacity-60"
           >
-            {busy ? 'Signing in…' : 'Sign in'}
+            {busy ? 'جارٍ تسجيل الدخول…' : 'تسجيل الدخول'}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-zinc-500">
-          No account?{' '}
+          ليس لديك حساب؟{' '}
           <Link to="/register" className="font-semibold text-red-400 hover:text-red-300">
-            Create account
+            إنشاء حساب
           </Link>
-        </p>
-        <p className="mt-4 text-center text-xs text-zinc-600">
-          Demo: after <code className="text-zinc-400">npm run seed</code>, use admin credentials from <code className="text-zinc-400">server/.env</code>.
         </p>
       </motion.div>
     </div>

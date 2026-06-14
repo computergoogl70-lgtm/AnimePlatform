@@ -17,7 +17,7 @@ export default function RegisterPage() {
     setBusy(true);
     try {
       await register({ email, password, displayName });
-      toast.success('Account created');
+      toast.success('تم إنشاء الحساب');
       navigate('/', { replace: true });
     } catch (err) {
       toast.error(err.message);
@@ -34,20 +34,20 @@ export default function RegisterPage() {
         animate={{ opacity: 1, y: 0 }}
         className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950/80 p-8 shadow-2xl shadow-black/60 backdrop-blur-xl"
       >
-        <h1 className="text-center text-2xl font-black text-white">Create your account</h1>
-        <p className="mt-2 text-center text-sm text-zinc-500">Join AnimeStream in seconds</p>
+        <h1 className="text-center text-2xl font-black text-white">إنشاء حساب جديد</h1>
+        <p className="mt-2 text-center text-sm text-zinc-500">انضم إلى انمي ستريم في ثوانٍ</p>
         <form onSubmit={submit} className="mt-8 space-y-4">
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Display name</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">الاسم</label>
             <input
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm text-white outline-none ring-red-500/30 focus:ring-2"
-              placeholder="Asta"
+              placeholder="أستا"
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Email</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">البريد الإلكتروني</label>
             <input
               type="email"
               required
@@ -58,7 +58,7 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Password</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">كلمة المرور</label>
             <input
               type="password"
               required
@@ -66,7 +66,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm text-white outline-none ring-red-500/30 focus:ring-2"
-              placeholder="At least 6 characters"
+              placeholder="6 أحرف على الأقل"
             />
           </div>
           <button
@@ -74,13 +74,13 @@ export default function RegisterPage() {
             disabled={busy}
             className="mt-2 w-full rounded-xl bg-gradient-to-r from-[#ff4b5c] to-[#e50914] py-3 text-sm font-bold text-white shadow-lg shadow-red-900/40 disabled:opacity-60"
           >
-            {busy ? 'Creating…' : 'Register'}
+            {busy ? 'جارٍ الإنشاء…' : 'تسجيل'}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-zinc-500">
-          Already have an account?{' '}
+          لديك حساب بالفعل؟{' '}
           <Link to="/login" className="font-semibold text-red-400 hover:text-red-300">
-            Sign in
+            تسجيل الدخول
           </Link>
         </p>
       </motion.div>

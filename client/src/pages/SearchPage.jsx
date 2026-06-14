@@ -82,20 +82,20 @@ export default function SearchPage() {
   };
 
   const heading = useMemo(() => {
-    if (q) return `Results for “${q}”`;
-    if (genre) return `${genre} anime`;
-    return 'Browse the catalog';
+    if (q) return `نتائج البحث عن "${q}"`;
+    if (genre) return `${genre} أنمي`;
+    return 'تصفح الكتالوج';
   }, [q, genre]);
 
   const handleImportMal = useCallback(
     async (malId) => {
       if (!isAdmin) {
-        toast.error('Sign in as admin to import titles.');
+        toast.error('سجل الدخول كمسؤول لاستيراد العناوين.');
         return;
       }
       try {
         const { data } = await api.post('/admin/anime/import-jikan', { malId });
-        toast.success(`Imported: ${data.anime.title}`);
+        toast.success(`تم الاستيراد: ${data.anime.title}`);
         navigate(`/anime/${data.anime._id}`);
       } catch (e) {
         toast.error(e.message);
@@ -109,28 +109,28 @@ export default function SearchPage() {
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
           <h1 className="text-3xl font-black text-white md:text-4xl">{heading}</h1>
-          <p className="text-sm text-zinc-500">Real-time search with MongoDB text indexes plus Jikan fallbacks.</p>
+          <p className="text-sm text-zinc-500">بحث فوري مع فهارس MongoDB النصية.</p>
         </motion.div>
 
         <div className="glass flex flex-col gap-4 rounded-2xl p-4 md:flex-row md:items-end">
           <div className="flex-1 space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Search</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">بحث</label>
             <input
               value={localQ}
               onChange={(e) => setLocalQ(e.target.value)}
-              placeholder="Titles, studios, vibes…"
+              placeholder="عناوين، أنواع، كلمات مفتاحية…"
               className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none ring-red-500/30 focus:ring-2"
             />
           </div>
           <div className="grid flex-1 gap-3 sm:grid-cols-3">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Genre</label>
+              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">التصنيف</label>
               <select
                 value={genre}
                 onChange={(e) => update('genre', e.target.value)}
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm text-white"
               >
-                <option value="">Any</option>
+                <option value="">الكل</option>
                 {['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance', 'Sci-Fi', 'Thriller'].map((g) => (
                   <option key={g} value={g}>
                     {g}
@@ -139,13 +139,13 @@ export default function SearchPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Year</label>
+              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">السنة</label>
               <select
                 value={year}
                 onChange={(e) => update('year', e.target.value)}
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm text-white"
               >
-                <option value="">Any</option>
+                <option value="">الكل</option>
                 {years.map((y) => (
                   <option key={y} value={y}>
                     {y}
@@ -154,7 +154,7 @@ export default function SearchPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Sort</label>
+              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">الترتيب</label>
               <select
                 value={sort || (popularity === 'high' ? 'popularity' : '')}
                 onChange={(e) => {
@@ -169,10 +169,10 @@ export default function SearchPage() {
                 }}
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm text-white"
               >
-                <option value="">Newest</option>
-                <option value="rating">Top rated</option>
-                <option value="popularity">Popularity</option>
-                <option value="year">Release year</option>
+                <option value="">الأحدث</option>
+                <option value="rating">الأعلى تقييماً</option>
+                <option value="popularity">الأكثر شهرة</option>
+                <option value="year">سنة الإصدار</option>
               </select>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function SearchPage() {
           <div className="space-y-6">
             {external.length > 0 && (
               <section>
-                <h2 className="mb-3 text-lg font-semibold text-zinc-300">Live suggestions (Jikan)</h2>
+                <h2 className="mb-3 text-lg font-semibold text-zinc-300">اقتراحات مباشرة (Jikan)</h2>
                 <div className="scrollbar-thin flex gap-4 overflow-x-auto pb-2">
                   {external.map((a, i) => (
                     <AnimeCard
@@ -202,16 +202,16 @@ export default function SearchPage() {
                   ))}
                 </div>
                 <p className="mt-2 text-xs text-zinc-600">
-                  These hits are from MyAnimeList (live lookup), not your database yet. Use <strong className="text-zinc-400">Open on MyAnimeList</strong> to see the listing, or{' '}
-                  <strong className="text-zinc-400">Add to my catalog</strong> (admins only) to import metadata—then add episodes in Admin.
+                  هذه النتائج من MyAnimeList (بحث مباشر)، وليست من قاعدة بياناتك بعد. استخدم <strong className="text-zinc-400">فتح على MyAnimeList</strong> لعرض القائمة، أو{' '}
+                  <strong className="text-zinc-400">إضافة إلى الكتالوج</strong> (للمسؤولين) لاستيراد البيانات.
                 </p>
               </section>
             )}
 
             <section>
-              <h2 className="mb-3 text-lg font-semibold text-white">Catalog</h2>
+              <h2 className="mb-3 text-lg font-semibold text-white">الكتالوج</h2>
               {results.length === 0 ? (
-                <p className="text-sm text-zinc-500">No local results yet. Seed the database or import from MyAnimeList.</p>
+                <p className="text-sm text-zinc-500">لا توجد نتائج محلية بعد. قم ببذر قاعدة البيانات أو استورد من MyAnimeList.</p>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {results.map((a, i) => (
