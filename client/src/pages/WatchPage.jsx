@@ -139,7 +139,7 @@ export default function WatchPage() {
               <VideoPlayer
                 key={`${episodeId}-${stream.url}`}
                 src={stream.url}
-                type={stream.type === 'mp4' ? 'mp4' : 'hls'}
+                type={stream.type || 'hls'}
                 subtitles={stream.subtitles || []}
                 poster={episode?.thumbnail || anime?.coverImage}
                 onTime={sendProgress}
