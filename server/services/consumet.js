@@ -10,9 +10,9 @@ const { ANIME } = require('@consumet/extensions');
 
 /** All providers available for importing episodes in the Admin panel */
 export const CONSUMET_PROVIDERS = [
-  { id: 'Witanime', label: 'Witanime (Arabic - Recommended)', watch: true },
-  { id: 'AnimeSaturn', label: 'AnimeSaturn (Italian)', watch: true },
+  { id: 'AnimeSaturn', label: 'AnimeSaturn (Italian - Recommended)', watch: true },
   { id: 'AnimeUnity', label: 'AnimeUnity (Italian)', watch: true },
+  { id: 'Witanime', label: 'Witanime (Arabic - may use embed fallback)', watch: true },
 ];
 
 export const WATCH_PROVIDERS = CONSUMET_PROVIDERS.filter((p) => p.watch);
@@ -89,7 +89,12 @@ export async function consumetEpisodeStream(providerId, episodeId) {
 
   // Route Witanime requests to our custom scraper
   if (providerId === 'Witanime') {
-    return witanimeEpisodeStream(episodeId);
+    try {
+      return await witanimeEpisodeStream(episodeId);
+    } catch (e) {
+      console.warn(`[consumet] Witanime stream failed, embed fallback: ${e.message}`);
+      return { url: episodeId, type: 'embed', subtitles: [] };
+    }
   }
 
   const provider = getConsometProvider(providerId);
@@ -124,8 +129,8 @@ export async function consumetEpisodeStream(providerId, episodeId) {
     console.warn(`[consumet] Stream extraction failed for ${providerId} (${episodeId}): ${e.message}`);
   }
 
-  // Graceful fallback for demo: if no direct video streams are resolved,
-  // we return the episode watch/page link itself as an iframe 'embed' fallback source!
+  // Graceful fallback: if no direct video streams are resolved,
+  // return the episode page link as an iframe 'embed' fallback source
   console.log(`[consumet] Falling back to embed/iframe for ${providerId} episode: ${episodeId}`);
   return {
     url: episodeId,

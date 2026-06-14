@@ -37,7 +37,7 @@ export default function AdminDashboardPage() {
   const [sections, setSections] = useState([]);
   const [episodes, setEpisodes] = useState([]);
   const [consumetProviders, setConsumetProviders] = useState([]);
-  const [consumetProvider, setConsumetProvider] = useState('Witanime');
+  const [consumetProvider, setConsumetProvider] = useState('AnimeSaturn');
   const [consumetQuery, setConsumetQuery] = useState('');
   const [consumetResults, setConsumetResults] = useState([]);
   const [consumetBusy, setConsumetBusy] = useState(false);
@@ -141,7 +141,7 @@ export default function AdminDashboardPage() {
     try {
       const { data } = await api.get('/admin/consumet/search', {
         params: { provider: consumetProvider, q: consumetQuery.trim() },
-        timeout: 30000, // Witanime can take 10-15s while rotating domains
+        timeout: 30000,
       });
       const results = data.data || [];
       setConsumetResults(results);
@@ -291,7 +291,7 @@ export default function AdminDashboardPage() {
             <div className="glass space-y-4 rounded-2xl p-6">
               <h2 className="text-lg font-bold text-white">Import episodes via Consumet</h2>
               <p className="text-sm text-zinc-500">
-                Pulls episode lists; stream is resolved when users watch. Prefer Witanime (Arabic - Recommended), AnimeSaturn, or AnimeUnity.
+                Pulls episode lists; stream is resolved when users watch. AnimeSaturn (Italian) provides the most reliable HLS streams.
               </p>
               <motion.div className="flex flex-wrap gap-3">
                 <select

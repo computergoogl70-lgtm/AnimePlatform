@@ -12,11 +12,10 @@ import crypto from 'crypto';
 
 // Domain rotation: we try each domain in order until one works.
 // This bypasses Cloudflare datacenter IP blocks common on hosting providers.
+// Note: witanime.net redirects to Google and does not serve anime content.
 const WITANIME_DOMAINS = [
-  'https://witanime.you',
-  'https://witanime.net',
   'https://witanime.com',
-  'https://witaanime.com',
+  'https://witanime.you',
 ];
 
 let BASE = WITANIME_DOMAINS[0];
@@ -246,7 +245,14 @@ async function resolveWtsrvUrl(wtsrvUrl) {
     headers: { ...DEFAULT_HEADERS, Referer: BASE },
     maxRedirects: 5,
     validateStatus: (s) => true,
+    timeout: 15000,
   });
+
+  // Detect Cloudflare challenge on wtsrv
+  if (timerRes.data.includes('__CF$cv$params') || timerRes.data.includes('cf-chl-')) {
+    throw new Error('wtsrv.xyz is behind Cloudflare challenge — cannot resolve server-side');
+  }
+
   let cookies = parseCookies(timerRes.headers);
 
   // 3. Call API (after simulated 5s wait the server allows it)
@@ -260,10 +266,13 @@ async function resolveWtsrvUrl(wtsrvUrl) {
     },
     maxRedirects: 0,
     validateStatus: (s) => true,
+    timeout: 15000,
   });
 
   const location = apiRes.headers.location;
-  if (!location) throw new Error('No redirect from wtsrv API');
+  if (!location || location.includes('error.php')) {
+    throw new Error('wtsrv API returned an error redirect (likely Cloudflare blocked)');
+  }
   return location; // e.g. https://workupload.com/file/XXXXXXXX
 }
 
@@ -440,7 +449,9 @@ export async function witanimeEpisodeStream(episodeId) {
 
   const wtsrvUrls = decryptServerUrls(data);
   if (!wtsrvUrls.length) {
-    throw new Error('No stream servers found for this episode.');
+    // Fallback: return episode URL as embed (browser handles Cloudflare natively)
+    console.log(`[witanime] No stream servers found, falling back to embed: ${episodeId}`);
+    return { url: episodeId, type: 'embed', subtitles: [] };
   }
 
   let lastError;
@@ -475,5 +486,7 @@ export async function witanimeEpisodeStream(episodeId) {
     }
   }
 
-  throw new Error(lastError?.message || 'All stream servers failed for this episode.');
+  // All resolution attempts failed — fall back to embed so the browser handles Cloudflare
+  console.log(`[witanime] All servers failed, falling back to embed: ${episodeId}`);
+  return { url: episodeId, type: 'embed', subtitles: [] };
 }
